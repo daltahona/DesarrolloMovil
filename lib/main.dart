@@ -1,122 +1,207 @@
 import 'package:flutter/material.dart';
 
+/// Función principal que inicia la aplicación Flutter
 void main() {
   runApp(const MyApp());
 }
 
+/// Widget principal de la aplicación que configura el MaterialApp
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  /// Construye la aplicación con el tema y la pantalla inicial
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      title: 'SafeCampus',
+      home: const WelcomeScreen(), // Pantalla de bienvenida como inicio
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+/// Pantalla de bienvenida con logo de la universidad y botón de inicio
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({super.key});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
-
+  /// Construye la interfaz de la pantalla de bienvenida
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // Contenido principal centrado (logo y título)
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Título de la aplicación
+                const Text(
+                  'SafeCampus',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 20),
+
+                // Imagen del logo de la universidad desde internet
+                Image.network(
+                  'https://logowik.com/content/uploads/images/universidad-de-la-guajira7775.logowik.com.webp',
+                  height: 150,
+                  errorBuilder: (context, error, stackTrace) {
+                    // Texto alternativo si falla la carga de la imagen
+                    return const Column(
+                      children: [
+                        Text(
+                          'UNIVERSIDAD',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'DE LA GUAJIRA',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text('SHIKII EKIRAJIA', style: TextStyle(fontSize: 14)),
+                        Text('PÜLEE WAJIRA', style: TextStyle(fontSize: 14)),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+
+          // Botón INICIAR posicionado en la parte inferior
+          Positioned(
+            bottom: 100, // Distancia desde el fondo de la pantalla
+            left: 0,
+            right: 0,
+            child: Column(
+              children: [
+                ElevatedButton(
+                  /// Navega a la pantalla principal al presionar el botón
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MainScreen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white, // Fondo blanco
+                    side: const BorderSide(color: Colors.black), // Borde negro
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(
+                        12,
+                      ), // Bordes redondeados
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 15,
+                    ),
+                  ),
+                  child: const Text(
+                    'INICIAR',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+    );
+  }
+}
+
+/// Pantalla principal con menú lateral y contenido dinámico
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  /// Crea el estado para la pantalla principal
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+/// Estado que maneja la lógica de la pantalla principal
+class _MainScreenState extends State<MainScreen> {
+  String _currentScreen = 'Menu Principal'; // Pantalla actualmente visible
+
+  /// Cambia la pantalla actual y cierra el menú lateral
+  void _changeScreen(String screen) {
+    setState(() {
+      _currentScreen = screen; // Actualiza la pantalla visible
+    });
+    Navigator.pop(context); // Cierra el drawer después de seleccionar
+  }
+
+  /// Navega de vuelta a la pantalla de bienvenida
+  void _goToHome() {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
+      (route) => false, // Elimina todas las rutas anteriores
+    );
+  }
+
+  /// Construye la interfaz de la pantalla principal
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('SafeCampus')),
+
+      // Menú lateral deslizable
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            // Encabezado del menú lateral
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text(
+                'Menú SafeCampus',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+
+            // Opciones del menú de emergencias
+            _buildDrawerItem('INCENDIO', 'Texto 1'),
+            _buildDrawerItem('SISMO', 'Texto 2'),
+            _buildDrawerItem('EMERGENCIA MÉDICA', 'Texto 3'),
+            _buildDrawerItem('SEGURIDAD', 'Texto 4'),
+            _buildDrawerItem('RUTAS DE EVACUACIÓN', 'Texto 5'),
+            _buildDrawerItem('CONTACTOS EMERGENCIA', 'Texto 6'),
+
+            const Divider(), // Línea separadora visual
+            // Opción para volver al inicio
+            ListTile(
+              leading: const Icon(Icons.home),
+              title: const Text('Volver al Inicio'),
+              onTap: _goToHome, // Ejecuta la función para volver al inicio
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+
+      // Contenido principal que cambia según la selección del menú
+      body: Center(
+        child: Text(_currentScreen, style: const TextStyle(fontSize: 24)),
+      ),
+    );
+  }
+
+  /// Crea un elemento del menú lateral con título y acción
+  Widget _buildDrawerItem(String title, String screen) {
+    return ListTile(
+      title: Text(title),
+      onTap: () => _changeScreen(screen), // Cambia la pantalla al hacer tap
     );
   }
 }
