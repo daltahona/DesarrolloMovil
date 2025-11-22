@@ -4,7 +4,7 @@ import 'user_report_screen.dart'; // acceso de usuario
 import 'login_screen.dart'; // importamos LoginScreen
 
 class ReportTypeScreen extends StatelessWidget {
-  final int userId; // 👈 recibimos el userId desde LoginScreen
+  final int userId; //  recibimos el userId desde LoginScreen
 
   const ReportTypeScreen({super.key, required this.userId});
 
@@ -141,7 +141,7 @@ class ReportTypeScreen extends StatelessWidget {
                             builder: (context) => ReportFormScreen(
                               type: reportTypes[index]['title']!,
                               existingData: null,
-                              userId: userId, // 👈 pasamos el userId
+                              userId: userId, //  pasamos el userId
                             ),
                           ),
                         );
@@ -157,9 +157,8 @@ class ReportTypeScreen extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => UserReportScreen(
-                      userId: userId,
-                    ), // 👈 pasamos el userId
+                    builder: (context) =>
+                        UserReportScreen(userId: userId), //  pasamos el userId
                   ),
                 );
               },

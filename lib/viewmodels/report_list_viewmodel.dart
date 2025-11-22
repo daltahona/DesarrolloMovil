@@ -13,7 +13,7 @@ class ReportListViewModel {
   /// Usado por el admin para ver todos los reportes
   Future<List<Report>> obtenerTodosLosReportes() async {
     final rows = await db
-        .obtenerReportesConUsuarios(); // 👈 usamos el método del helper
+        .obtenerReportesConUsuarios(); //  usamos el método del helper
     return rows.map((row) => Report.fromMap(row)).toList();
   }
 

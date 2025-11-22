@@ -8,7 +8,7 @@ import 'report_success_screen.dart';
 class ReportFormScreen extends StatefulWidget {
   final String type;
   final Map<String, dynamic>? existingData;
-  final int userId; // 👈 obligatorio
+  final int userId; // obligatorio
 
   const ReportFormScreen({
     super.key,

@@ -64,9 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('remember_me', false);
       }
 
-      final int userId = userData['id']; // 👈 obtenemos el id del usuario
-      final String userRole =
-          userData['role']; // 👈 obtenemos el rol del usuario
+      final int userId = userData['id']; //  obtenemos el id del usuario
+      final String userRole = userData['role']; //  obtenemos el rol del usuario
 
       if (userRole == 'admin') {
         Navigator.pushReplacementNamed(

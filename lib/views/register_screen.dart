@@ -13,7 +13,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _userController = TextEditingController();
   final _passController = TextEditingController();
 
-  // 👇 Rol fijo en "user"
+  //  Rol fijo en "user"
   final String _role = "user";
   String? _message;
 

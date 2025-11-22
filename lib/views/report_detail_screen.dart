@@ -5,12 +5,12 @@ import 'report_form_screen.dart';
 
 class ReportDetailScreen extends StatelessWidget {
   final Report reporte;
-  final int userId; // 👈 nuevo parámetro obligatorio
+  final int userId; //  nuevo parámetro obligatorio
 
   const ReportDetailScreen({
     super.key,
     required this.reporte,
-    required this.userId, // 👈 se debe pasar desde ReportListScreen
+    required this.userId, //  se debe pasar desde ReportListScreen
   });
 
   @override
@@ -43,7 +43,7 @@ class ReportDetailScreen extends StatelessWidget {
                   builder: (context) => ReportFormScreen(
                     type: reporte.tipo,
                     existingData: reporte.toMap(),
-                    userId: userId, // 👈 se pasa al formulario
+                    userId: userId, //  se pasa al formulario
                   ),
                 ),
               );

@@ -360,7 +360,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
       ),
 
       floatingActionButton: widget.userRole == 'admin'
-          ? null // 👈 no mostrar nada para admin
+          ? null //  no mostrar nada para admin
           : FloatingActionButton.extended(
               backgroundColor: Colors.white,
               foregroundColor: const Color(0xFF1B4C4C),

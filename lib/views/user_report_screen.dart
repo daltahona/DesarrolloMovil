@@ -5,7 +5,7 @@ import '../viewmodels/report_list_viewmodel.dart';
 import 'report_form_screen.dart'; // necesario para abrir el formulario
 
 class UserReportScreen extends StatefulWidget {
-  final int userId; // 👈 nuevo campo obligatorio
+  final int userId; //  nuevo campo obligatorio
 
   const UserReportScreen({super.key, required this.userId});
 
@@ -20,7 +20,7 @@ class _UserReportScreenState extends State<UserReportScreen> {
   @override
   void initState() {
     super.initState();
-    // 👇 ahora cargamos solo los reportes del usuario logueado
+    // ahora cargamos solo los reportes del usuario logueado
     _reportes = vm.obtenerReportesPorUsuario(widget.userId);
   }
 
@@ -187,8 +187,8 @@ class _UserReportScreenState extends State<UserReportScreen> {
                                       builder: (context) => ReportFormScreen(
                                         type: r.tipo,
                                         existingData: r.toMap(),
-                                        userId: widget
-                                            .userId, // 👈 pasamos el userId
+                                        userId:
+                                            widget.userId, // pasamos el userId
                                       ),
                                     ),
                                   ).then((value) {

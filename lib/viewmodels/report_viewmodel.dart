@@ -53,13 +53,13 @@ class ReportViewModel {
       );
     } else {
       // Al crear, se asigna automáticamente el estado "En trámite"
-      // 👇 ahora incluimos el userId del usuario logueado
+      //  ahora incluimos el userId del usuario logueado
       await db.agregarReporte(
         report.tipo,
         report.direccion,
         report.referencia,
         report.foto_path,
-        report.userId, // 👈 nuevo parámetro obligatorio
+        report.userId, //  nuevo parámetro obligatorio
       );
     }
   }
