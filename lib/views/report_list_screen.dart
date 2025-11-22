@@ -7,7 +7,14 @@ import 'report_detail_screen.dart';
 import 'login_screen.dart';
 
 class ReportListScreen extends StatefulWidget {
-  const ReportListScreen({super.key});
+  final int userId;
+  final String userRole; // 'admin' o 'user'
+
+  const ReportListScreen({
+    super.key,
+    required this.userId,
+    required this.userRole,
+  });
 
   @override
   State<ReportListScreen> createState() => _ReportListScreenState();
@@ -20,7 +27,11 @@ class _ReportListScreenState extends State<ReportListScreen> {
   @override
   void initState() {
     super.initState();
-    _reportes = vm.obtenerReportes();
+    if (widget.userRole == 'admin') {
+      _reportes = vm.obtenerTodosLosReportes();
+    } else {
+      _reportes = vm.obtenerReportesPorUsuario(widget.userId);
+    }
   }
 
   Future<void> _eliminarReporte(int id) async {
@@ -49,18 +60,24 @@ class _ReportListScreenState extends State<ReportListScreen> {
 
     if (confirm == true) {
       await vm.eliminarReporte(id);
-      final nuevosReportes = vm.obtenerReportes();
       setState(() {
-        _reportes = nuevosReportes;
+        if (widget.userRole == 'admin') {
+          _reportes = vm.obtenerTodosLosReportes();
+        } else {
+          _reportes = vm.obtenerReportesPorUsuario(widget.userId);
+        }
       });
     }
   }
 
   Future<void> _cambiarEstado(int id, String nuevoEstado) async {
     await vm.actualizarEstado(id, nuevoEstado);
-    final nuevosReportes = vm.obtenerReportes();
     setState(() {
-      _reportes = nuevosReportes;
+      if (widget.userRole == 'admin') {
+        _reportes = vm.obtenerTodosLosReportes();
+      } else {
+        _reportes = vm.obtenerReportesPorUsuario(widget.userId);
+      }
     });
   }
 
@@ -128,11 +145,22 @@ class _ReportListScreenState extends State<ReportListScreen> {
       body: FutureBuilder<List<Report>>(
         future: _reportes,
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(child: CircularProgressIndicator());
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.white),
+            );
           }
 
-          final reportes = snapshot.data!;
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(
+                "Error: ${snapshot.error}",
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
+          }
+
+          final reportes = snapshot.data ?? [];
           if (reportes.isEmpty) {
             return const Center(
               child: Text(
@@ -160,18 +188,21 @@ class _ReportListScreenState extends State<ReportListScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ReportDetailScreen(reporte: r),
+                          builder: (context) => ReportDetailScreen(
+                            reporte: r,
+                            userId: widget.userId,
+                          ),
                         ),
                       );
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Imagen + Título
+                        // Imagen + Título + datos principales
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            r.foto_path != null
+                            r.foto_path != null && r.foto_path!.isNotEmpty
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(8),
                                     child: Image.file(
@@ -200,6 +231,19 @@ class _ReportListScreenState extends State<ReportListScreen> {
                                     ),
                                   ),
                                   Text(r.referencia),
+                                  if (widget.userRole == 'admin' &&
+                                      r.userName != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                        "Usuario: ${r.userName}",
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF1B4C4C),
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                             ),
@@ -228,7 +272,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                                 ),
                               ],
                               onChanged: (nuevoEstado) {
-                                if (nuevoEstado != null) {
+                                if (nuevoEstado != null && r.id != null) {
                                   _cambiarEstado(r.id!, nuevoEstado);
                                 }
                               },
@@ -250,22 +294,26 @@ class _ReportListScreenState extends State<ReportListScreen> {
                                     builder: (context) => ReportFormScreen(
                                       type: r.tipo,
                                       existingData: r.toMap(),
+                                      userId: widget.userId,
                                     ),
                                   ),
                                 );
                                 if (updated == true) {
-                                  final nuevosReportes = vm.obtenerReportes();
                                   setState(() {
-                                    _reportes = nuevosReportes;
+                                    if (widget.userRole == 'admin') {
+                                      _reportes = vm.obtenerTodosLosReportes();
+                                    } else {
+                                      _reportes = vm.obtenerReportesPorUsuario(
+                                        widget.userId,
+                                      );
+                                    }
                                   });
                                 }
                               },
                               icon: const Icon(Icons.edit, size: 18),
                               label: const Text("Editar"),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(
-                                  0xFF1B4C4C,
-                                ), // color principal
+                                backgroundColor: const Color(0xFF1B4C4C),
                                 foregroundColor: Colors.white,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
@@ -278,14 +326,14 @@ class _ReportListScreenState extends State<ReportListScreen> {
                             ),
                             const SizedBox(width: 12),
                             ElevatedButton.icon(
-                              onPressed: () => _eliminarReporte(r.id!),
+                              onPressed: () {
+                                if (r.id != null) _eliminarReporte(r.id!);
+                              },
                               icon: const Icon(Icons.delete, size: 18),
                               label: const Text("Eliminar"),
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.white, // fondo blanco
-                                foregroundColor: const Color(
-                                  0xFFB71C1C,
-                                ), // rojo elegante
+                                backgroundColor: Colors.white,
+                                foregroundColor: const Color(0xFFB71C1C),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 8,
@@ -293,7 +341,7 @@ class _ReportListScreenState extends State<ReportListScreen> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                   side: const BorderSide(
-                                    color: Color(0xFFB71C1C), // borde rojo
+                                    color: Color(0xFFB71C1C),
                                     width: 1.5,
                                   ),
                                 ),
@@ -310,6 +358,31 @@ class _ReportListScreenState extends State<ReportListScreen> {
           );
         },
       ),
+
+      floatingActionButton: widget.userRole == 'admin'
+          ? null // 👈 no mostrar nada para admin
+          : FloatingActionButton.extended(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF1B4C4C),
+              icon: const Icon(Icons.add),
+              label: const Text('Nuevo reporte'),
+              onPressed: () async {
+                final created = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ReportFormScreen(
+                      userId: widget.userId,
+                      type: 'General',
+                    ),
+                  ),
+                );
+                if (created == true) {
+                  setState(() {
+                    _reportes = vm.obtenerReportesPorUsuario(widget.userId);
+                  });
+                }
+              },
+            ),
     );
   }
 }

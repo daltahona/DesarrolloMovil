@@ -5,7 +5,9 @@ class Report {
   final String referencia;
   final String? foto_path;
   final String? fecha;
-  final String estado; // nuevo campo
+  final String estado;
+  final int userId; // 👈 obligatorio
+  final String? userName; // 👈 nuevo campo opcional para mostrar el nombre
 
   Report({
     this.id,
@@ -15,6 +17,8 @@ class Report {
     this.foto_path,
     this.fecha,
     this.estado = "En trámite", // valor por defecto
+    required this.userId,
+    this.userName, // 👈 se puede pasar si lo traes del JOIN
   });
 
   factory Report.fromMap(Map<String, dynamic> map) {
@@ -25,7 +29,9 @@ class Report {
       referencia: map['referencia'],
       foto_path: map['foto_path'],
       fecha: map['fecha'],
-      estado: map['estado'] ?? "En trámite", // leer estado
+      estado: map['estado'] ?? "En trámite",
+      userId: map['user_id'], // 👈 lo leemos de la BD
+      userName: map['userName'], // 👈 lo traemos del JOIN si existe
     );
   }
 
@@ -37,7 +43,9 @@ class Report {
       'referencia': referencia,
       'foto_path': foto_path,
       'fecha': fecha,
-      'estado': estado, // guardar estado
+      'estado': estado,
+      'user_id': userId, // 👈 lo guardamos en la BD
+      'userName': userName, // 👈 opcional, útil para mostrar en UI
     };
   }
 }

@@ -8,8 +8,14 @@ import 'report_success_screen.dart';
 class ReportFormScreen extends StatefulWidget {
   final String type;
   final Map<String, dynamic>? existingData;
+  final int userId; // 👈 obligatorio
 
-  const ReportFormScreen({super.key, required this.type, this.existingData});
+  const ReportFormScreen({
+    super.key,
+    required this.type,
+    this.existingData,
+    required this.userId,
+  });
 
   @override
   State<ReportFormScreen> createState() => _ReportFormScreenState();
@@ -141,8 +147,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
+
                     if (selectedImage != null)
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
@@ -188,10 +194,8 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
 
                               // Ajuste para evitar duplicados
                               if (isEditing && selectedImage == null) {
-                                // conservar la foto original
                                 imagePath = widget.existingData?["foto_path"];
                               } else if (selectedImage != null) {
-                                // guardar solo si hay nueva imagen
                                 imagePath = await vm.saveInternal(
                                   selectedImage!,
                                 );
@@ -208,6 +212,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                                 estado:
                                     widget.existingData?["estado"] ??
                                     "En trámite",
+                                userId: widget.userId,
                               );
 
                               await vm.guardarReporte(
@@ -227,6 +232,7 @@ class _ReportFormScreenState extends State<ReportFormScreen> {
                                       tipo: report.tipo,
                                       direccion: report.direccion,
                                       referencia: report.referencia,
+                                      userId: widget.userId,
                                     ),
                                   ),
                                 );

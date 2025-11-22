@@ -6,12 +6,14 @@ class ReportSuccessScreen extends StatelessWidget {
   final String direccion;
   final String referencia;
   final String estado;
+  final int userId; // 👈 nuevo parámetro obligatorio
 
   const ReportSuccessScreen({
     super.key,
     required this.tipo,
     required this.direccion,
     required this.referencia,
+    required this.userId, // 👈 se debe pasar siempre
     this.estado = "En trámite", // valor por defecto
   });
 
@@ -82,7 +84,9 @@ class ReportSuccessScreen extends StatelessWidget {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ReportTypeScreen(),
+                          builder: (context) => ReportTypeScreen(
+                            userId: userId, // 👈 pasamos el userId
+                          ),
                         ),
                         (route) => false,
                       );

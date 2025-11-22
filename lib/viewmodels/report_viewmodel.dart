@@ -36,7 +36,7 @@ class ReportViewModel {
   /// Guardar o actualizar un reporte en la BD
   Future<void> guardarReporte(Report report, {bool isEditing = false}) async {
     if (isEditing && report.id != null) {
-      //  Al editar, conservar la foto original si no se cambió
+      // Al editar, conservar la foto original si no se cambió
       final reporteExistente = await db.obtenerReportePorId(report.id!);
 
       final String? fotoFinal =
@@ -52,12 +52,14 @@ class ReportViewModel {
         fotoFinal,
       );
     } else {
-      //  Al crear, se asigna automáticamente el estado "En trámite"
+      // Al crear, se asigna automáticamente el estado "En trámite"
+      // 👇 ahora incluimos el userId del usuario logueado
       await db.agregarReporte(
         report.tipo,
         report.direccion,
         report.referencia,
         report.foto_path,
+        report.userId, // 👈 nuevo parámetro obligatorio
       );
     }
   }

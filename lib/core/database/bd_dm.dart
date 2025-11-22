@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:bcrypt/bcrypt.dart'; // librería para hashing seguro
-import '../../models/report_model.dart'; // Importa tu modelo Report
+import 'package:bcrypt/bcrypt.dart';
+import '../../models/report_model.dart';
 
 /// Clase de base de datos como Singleton para gestión eficiente
 class BbDM {
@@ -27,7 +27,7 @@ class BbDM {
 
     final db = await openDatabase(
       path,
-      version: 5, // versión actual
+      version: 6, // subimos versión para incluir user_id
       onCreate: (db, version) async {
         await db.execute('''
           CREATE TABLE reportes (
@@ -37,7 +37,9 @@ class BbDM {
             referencia TEXT NOT NULL,
             foto_path TEXT,
             fecha TEXT NOT NULL,
-            estado TEXT DEFAULT 'En trámite'
+            estado TEXT DEFAULT 'En trámite',
+            user_id INTEGER NOT NULL,
+            FOREIGN KEY(user_id) REFERENCES usuarios(id)
           )
         ''');
 
@@ -89,6 +91,10 @@ class BbDM {
             'password': BCrypt.hashpw('Admin1234', BCrypt.gensalt()),
             'role': 'admin',
           });
+        }
+        if (oldV < 6) {
+          // nuevo campo user_id
+          await db.execute("ALTER TABLE reportes ADD COLUMN user_id INTEGER");
         }
       },
     );
@@ -142,6 +148,7 @@ class BbDM {
     String direccion,
     String referencia,
     String? fotoPath,
+    int userId,
   ) async {
     final db = await database;
     await db.insert('reportes', {
@@ -151,6 +158,7 @@ class BbDM {
       'foto_path': fotoPath,
       'fecha': DateTime.now().toIso8601String(),
       'estado': 'En trámite',
+      'user_id': userId,
     });
   }
 
@@ -189,6 +197,39 @@ class BbDM {
     final db = await database;
     final result = await db.query('reportes', orderBy: 'fecha DESC');
     return result.map((e) => Report.fromMap(e)).toList();
+  }
+
+  /// Reportes filtrados por usuario
+  Future<List<Report>> obtenerReportesPorUsuario(int userId) async {
+    final db = await database;
+    final result = await db.query(
+      'reportes',
+      where: 'user_id = ?',
+      whereArgs: [userId],
+      orderBy: 'fecha DESC',
+    );
+    return result.map((e) => Report.fromMap(e)).toList();
+  }
+
+  /// Nuevo método: obtener todos los reportes con nombre de usuario (solo admin)
+  Future<List<Map<String, Object?>>> obtenerReportesConUsuarios() async {
+    final db = await database;
+    final result = await db.rawQuery('''
+      SELECT 
+        r.id,
+        r.tipo,
+        r.direccion,
+        r.referencia,
+        r.foto_path,
+        r.fecha,
+        r.estado,
+        r.user_id,
+        u.username AS userName
+      FROM reportes r
+      INNER JOIN usuarios u ON r.user_id = u.id
+      ORDER BY r.fecha DESC
+    ''');
+    return result;
   }
 
   Future<Report?> obtenerReportePorId(int id) async {
@@ -244,7 +285,6 @@ class BbDM {
     if (result.isNotEmpty) {
       final user = result.first;
       final hashed = user['password'] as String;
-
       if (BCrypt.checkpw(password, hashed)) {
         return user;
       }

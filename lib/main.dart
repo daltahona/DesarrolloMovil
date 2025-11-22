@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'views/login_screen.dart';
+import 'views/report_list_screen.dart';
+import 'views/report_type_screen.dart';
+import 'views/report_success_screen.dart'; // si usas esta pantalla
 
 void main() async {
-  // Esto asegura que los plugins nativos estén listos antes de ejecutar la app
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(const ReportApp());
@@ -17,7 +19,39 @@ class ReportApp extends StatelessWidget {
       title: 'Sistema de reporte ciudadano',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const LoginScreen(), // inicia en login
+      home: const LoginScreen(), // ✅ punto de entrada
+      onGenerateRoute: (settings) {
+        if (settings.name == '/reportList') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => ReportListScreen(
+              userId: args['userId'],
+              userRole: args['userRole'],
+            ),
+          );
+        }
+
+        if (settings.name == '/reportType') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => ReportTypeScreen(userId: args['userId']),
+          );
+        }
+
+        if (settings.name == '/reportSuccess') {
+          final args = settings.arguments as Map<String, dynamic>;
+          return MaterialPageRoute(
+            builder: (_) => ReportSuccessScreen(
+              tipo: args['tipo'],
+              direccion: args['direccion'],
+              referencia: args['referencia'],
+              userId: args['userId'],
+            ),
+          );
+        }
+
+        return null; // si la ruta no existe
+      },
     );
   }
 }

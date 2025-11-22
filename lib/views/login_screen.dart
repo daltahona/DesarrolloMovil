@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // para guardar credenciales
 import '../core/database/bd_dm.dart';
-import 'report_list_screen.dart';
-import 'report_type_screen.dart'; // redirigir aquí para usuarios
 import 'register_screen.dart';
 import 'recover_password_screen.dart'; // nueva pantalla de recuperación
 
@@ -66,15 +64,21 @@ class _LoginScreenState extends State<LoginScreen> {
         await prefs.setBool('remember_me', false);
       }
 
-      if (userData['role'] == 'admin') {
-        Navigator.pushReplacement(
+      final int userId = userData['id']; // 👈 obtenemos el id del usuario
+      final String userRole =
+          userData['role']; // 👈 obtenemos el rol del usuario
+
+      if (userRole == 'admin') {
+        Navigator.pushReplacementNamed(
           context,
-          MaterialPageRoute(builder: (context) => const ReportListScreen()),
+          '/reportList',
+          arguments: {'userId': userId, 'userRole': userRole},
         );
       } else {
-        Navigator.pushReplacement(
+        Navigator.pushReplacementNamed(
           context,
-          MaterialPageRoute(builder: (context) => const ReportTypeScreen()),
+          '/reportType',
+          arguments: {'userId': userId},
         );
       }
     } else {
@@ -84,7 +88,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // estilo común para los textos
     final linkStyle = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
@@ -92,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     return Scaffold(
-      backgroundColor: const Color(0xFF1B4C4C), // fondo suave
+      backgroundColor: const Color(0xFF1B4C4C),
       body: Center(
         child: SingleChildScrollView(
           child: Card(
